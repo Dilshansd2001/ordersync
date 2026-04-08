@@ -1,0 +1,2 @@
+ALTER TABLE products
+ADD COLUMN stock_count NUMERIC NOT NULL DEFAULT 0;

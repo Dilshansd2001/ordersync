@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #172033;
+  background: #f8fafc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #f8fafc;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+html.dark body {
+  background:
+    radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 30%),
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.2), transparent 32%),
+    linear-gradient(180deg, #020617 0%, #0f172a 100%);
+  color: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  position: relative;
+}
+
+.app-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.18), transparent 20%),
+    radial-gradient(circle at 85% 10%, rgba(244, 114, 182, 0.16), transparent 18%),
+    radial-gradient(circle at 75% 75%, rgba(34, 197, 94, 0.12), transparent 20%);
+  opacity: 0.9;
+}
+
+.signal-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.signal-loader span {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 9999px;
+  animation: signal-bounce 1.1s infinite ease-in-out;
+}
+
+.signal-loader span:nth-child(1) {
+  background: #38bdf8;
+}
+
+.signal-loader span:nth-child(2) {
+  background: #818cf8;
+  animation-delay: 0.15s;
+}
+
+.signal-loader span:nth-child(3) {
+  background: #f472b6;
+  animation-delay: 0.3s;
+}
+
+.animate-fade-up {
+  animation: fade-up 820ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 820ms ease both;
+}
+
+.animate-float-soft {
+  animation: float-soft 8s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4.8s ease-in-out infinite;
+}
+
+.animation-delay-100 {
+  animation-delay: 80ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 160ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 240ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 320ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 400ms;
+}
+
+@keyframes signal-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+
+  40% {
+    transform: translateY(-0.35rem);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 18px 44px rgba(59, 130, 246, 0.22);
+  }
+
+  50% {
+    box-shadow: 0 22px 52px rgba(139, 92, 246, 0.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-float-soft,
+  .animate-pulse-glow {
+    animation: none !important;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body.report-print-mode aside,
+  body.report-print-mode header,
+  body.report-print-mode .print\:hidden,
+  body.report-print-mode button,
+  body.report-print-mode input {
+    display: none !important;
+  }
+
+  body.report-print-mode main {
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  body.report-print-mode .report-page {
+    padding: 0 !important;
+  }
+
+  body.report-print-mode .report-page > section {
+    break-inside: avoid;
+    box-shadow: none !important;
+  }
+
+  body.report-print-mode .report-print-sheet {
+    display: block !important;
+    color: #0f172a !important;
+    padding: 14mm 12mm 10mm !important;
+    box-sizing: border-box !important;
+  }
+}

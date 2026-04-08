@@ -1,0 +1,76 @@
+{
+  "name": "ordersync-desktop-product",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Installable Electron desktop product for OrderSync.lk.",
+  "main": "desktop/electron/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "frontend:build": "npm --prefix frontend run build",
+    "electron:start": "set ELECTRON_RUN_AS_NODE=&& electron .",
+    "electron:smoke": "set ELECTRON_RUN_AS_NODE=&& electron desktop/electron/min-main.js",
+    "dist": "npm run frontend:build && electron-builder --win nsis",
+    "dist:dir": "npm run frontend:build && electron-builder --dir"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.1.1",
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "electron": "^37.2.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "lk.ordersync.desktop",
+    "productName": "OrderSync.lk",
+    "asar": true,
+    "extraResources": [
+      {
+        "from": "build-assets/icon.ico",
+        "to": "build-assets/icon.ico"
+      }
+    ],
+    "files": [
+      "desktop/electron/**/*",
+      "desktop/local-db/**/*",
+      "frontend/dist/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build-assets",
+      "output": "release"
+    },
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build-assets/icon.ico",
+      "artifactName": "OrderSync.lk-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "OrderSync.lk",
+      "artifactName": "OrderSync.lk-Setup-${version}.${ext}",
+      "installerIcon": "build-assets/icon.ico",
+      "uninstallerIcon": "build-assets/icon.ico",
+      "installerHeaderIcon": "build-assets/icon.ico",
+      "warningsAsErrors": false
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "your-github-owner",
+        "repo": "ordersync"
+      }
+    ]
+  }
+}
