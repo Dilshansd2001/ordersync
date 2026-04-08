@@ -35,6 +35,9 @@ const navItems = [
   { label: 'FAQ', href: '#faq' },
 ]
 
+const DESKTOP_DOWNLOAD_URL =
+  'https://github.com/Dilshansd2001/ordersync/releases/download/v1.0.1/OrderSync.lk-Setup-1.0.1.exe'
+
 const trustBullets = [
   'Offline-first desktop workflow',
   'Sri Lanka-focused seller operations',
@@ -322,6 +325,14 @@ function LandingPage() {
             </nav>
 
             <div className="flex items-center gap-3">
+              <a
+                className="hidden rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:border-white/20 hover:bg-white/10 sm:inline-flex"
+                href={DESKTOP_DOWNLOAD_URL}
+                rel="noreferrer"
+                target="_blank"
+              >
+                Download App
+              </a>
               <Link
                 className="hidden rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:border-white/20 hover:bg-white/10 sm:inline-flex"
                 to="/login"
@@ -358,8 +369,17 @@ function LandingPage() {
                   </p>
 
                   <div className="animate-fade-up animation-delay-300 mt-8 flex flex-col gap-3 sm:flex-row">
-                    <Link
+                    <a
                       className="animate-pulse-glow inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_20px_50px_rgba(59,130,246,0.35)] transition hover:translate-y-[-1px] hover:shadow-[0_24px_60px_rgba(79,70,229,0.45)]"
+                      href={DESKTOP_DOWNLOAD_URL}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      Download Desktop App
+                      <HardDriveDownload className="h-4 w-4" />
+                    </a>
+                    <Link
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/8 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-cyan-300/30 hover:bg-white/12"
                       to="/register"
                     >
                       Start Free Trial
@@ -814,8 +834,17 @@ function LandingPage() {
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-                    <Link
+                    <a
                       className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-[0_16px_40px_rgba(255,255,255,0.15)] transition hover:translate-y-[-1px] hover:bg-slate-100"
+                      href={DESKTOP_DOWNLOAD_URL}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      Download for Windows
+                      <HardDriveDownload className="h-4 w-4" />
+                    </a>
+                    <Link
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/16"
                       to="/register"
                     >
                       Start Free Trial
