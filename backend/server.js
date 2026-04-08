@@ -52,6 +52,15 @@ app.get('/', (req, res) => {
   })
 })
 
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: 'ok',
+    service: 'ordersync-backend',
+    environment: env.nodeEnv,
+  })
+})
+
 app.use('/api/auth', authRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/analytics', analyticsRoutes)

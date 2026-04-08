@@ -122,6 +122,10 @@ Recommended release asset:
 - Database: MongoDB Atlas
 - Desktop installer distribution: GitHub Releases
 
+See also:
+
+- `DEPLOYMENT.md`
+
 ## Notes
 
 - Backend currently serves `/uploads` locally for development, so production should use external object/file storage where possible.
