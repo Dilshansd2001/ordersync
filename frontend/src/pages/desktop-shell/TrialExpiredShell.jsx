@@ -1,12 +1,12 @@
 import { ArrowRight, Clock3 } from 'lucide-react'
 import PageMeta from '@/components/PageMeta'
 import LicenseStatusPill from '@/components/desktop-shell/LicenseStatusPill'
-import { openExternalLink } from '@/platform/externalLinks'
+import { openExternalLink, ORDER_SYNC_PRICING_URL } from '@/platform/externalLinks'
 
 function TrialExpiredShell({ metadata, onLogout }) {
   const handleUpgradePlan = (event) => {
     event.preventDefault()
-    openExternalLink('https://ordersync.lk/#pricing')
+    openExternalLink(ORDER_SYNC_PRICING_URL)
   }
 
   return (
@@ -39,14 +39,14 @@ function TrialExpiredShell({ metadata, onLogout }) {
         </div>
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <a
+          <button
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(59,130,246,0.35)] transition hover:translate-y-[-1px]"
-            href="https://ordersync.lk/#pricing"
             onClick={handleUpgradePlan}
+            type="button"
           >
             Upgrade your plan
             <ArrowRight className="h-4 w-4" />
-          </a>
+          </button>
           <button
             className="rounded-2xl border border-white/10 bg-white/6 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
             onClick={onLogout}

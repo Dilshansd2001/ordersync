@@ -1,12 +1,12 @@
 import { ArrowRight, RefreshCcw, ShieldAlert } from 'lucide-react'
 import PageMeta from '@/components/PageMeta'
 import LicenseStatusPill from '@/components/desktop-shell/LicenseStatusPill'
-import { openExternalLink } from '@/platform/externalLinks'
+import { openExternalLink, ORDER_SYNC_PRICING_URL } from '@/platform/externalLinks'
 
 function SubscriptionInactiveShell({ accessMode, message, metadata, onLogout, onRetry }) {
   const handleRenewSubscription = (event) => {
     event.preventDefault()
-    openExternalLink('https://ordersync.lk/#pricing')
+    openExternalLink(ORDER_SYNC_PRICING_URL)
   }
 
   return (
@@ -47,14 +47,14 @@ function SubscriptionInactiveShell({ accessMode, message, metadata, onLogout, on
             Retry verification
             <RefreshCcw className="h-4 w-4" />
           </button>
-          <a
+          <button
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/6 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
-            href="https://ordersync.lk/#pricing"
             onClick={handleRenewSubscription}
+            type="button"
           >
             Renew subscription
             <ArrowRight className="h-4 w-4" />
-          </a>
+          </button>
           <button
             className="rounded-2xl border border-white/10 bg-white/6 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
             onClick={onLogout}

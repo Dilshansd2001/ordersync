@@ -2,7 +2,11 @@ import { LoaderCircle, LockKeyhole, Wifi } from 'lucide-react'
 import { useState } from 'react'
 import desktopLoginLogo from '@/assets/branding/ordersync-logo-dark.png'
 import PageMeta from '@/components/PageMeta'
-import { openExternalLink } from '@/platform/externalLinks'
+import {
+  openExternalLink,
+  ORDER_SYNC_FORGOT_PASSWORD_URL,
+  ORDER_SYNC_REGISTER_URL,
+} from '@/platform/externalLinks'
 
 const loginInputClassName =
   'w-full rounded-2xl border border-white/10 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20'
@@ -18,12 +22,12 @@ function LoginShell({ error, isSubmitting, onSubmit }) {
 
   const handleOpenPricing = (event) => {
     event.preventDefault()
-    openExternalLink('https://ordersync.lk/#pricing')
+    openExternalLink(ORDER_SYNC_REGISTER_URL)
   }
 
   const handleForgotPassword = (event) => {
     event.preventDefault()
-    openExternalLink('mailto:support@ordersync.lk?subject=Forgot%20Password')
+    openExternalLink(ORDER_SYNC_FORGOT_PASSWORD_URL)
   }
 
   const handleSubmit = (event) => {
@@ -96,12 +100,20 @@ function LoginShell({ error, isSubmitting, onSubmit }) {
             </button>
 
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-sm text-slate-400">
-              <a className="font-medium text-cyan-200 transition hover:text-white" href="https://ordersync.lk/#pricing" onClick={handleOpenPricing}>
+              <button
+                className="font-medium text-cyan-200 transition hover:text-white"
+                onClick={handleOpenPricing}
+                type="button"
+              >
                 Start free trial
-              </a>
-              <a className="font-medium transition hover:text-white" href="mailto:support@ordersync.lk?subject=Forgot%20Password" onClick={handleForgotPassword}>
+              </button>
+              <button
+                className="font-medium transition hover:text-white"
+                onClick={handleForgotPassword}
+                type="button"
+              >
                 Forgot password
-              </a>
+              </button>
             </div>
           </form>
         </div>
