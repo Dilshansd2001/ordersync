@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs')
 const User = require('../models/User')
 
 const ensureSuperAdmin = async ({ name, email, password }) => {
@@ -9,10 +10,21 @@ const ensureSuperAdmin = async ({ name, email, password }) => {
   const existingUser = await User.findOne({ email: normalizedEmail })
 
   if (existingUser) {
-    if (existingUser.role !== 'SUPER_ADMIN' || existingUser.status !== 'active') {
+    if (
+      existingUser.role !== 'SUPER_ADMIN' ||
+      existingUser.status !== 'active' ||
+      existingUser.name !== name
+    ) {
       existingUser.role = 'SUPER_ADMIN'
       existingUser.status = 'active'
-      existingUser.name = existingUser.name || name
+      existingUser.name = name
+      await existingUser.save()
+    }
+
+    const passwordMatches = await bcrypt.compare(password, existingUser.password)
+
+    if (!passwordMatches) {
+      existingUser.password = password
       await existingUser.save()
     }
 
