@@ -68,7 +68,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "your-github-owner",
+        "owner": "Dilshansd2001",
         "repo": "ordersync"
       }
     ]

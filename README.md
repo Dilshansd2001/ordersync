@@ -58,6 +58,8 @@ http://localhost:5173
 ### 3. Desktop App
 
 Create `desktop/.env` from `desktop/.env.example` if needed.
+The packaged app defaults to the production backend at `https://ordersync-yxm7.onrender.com/api`.
+For local development, set `ORDERSYNC_SYNC_API_URL=http://localhost:5000/api`.
 
 From the project root:
 

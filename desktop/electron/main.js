@@ -18,6 +18,8 @@ const { TenantContextService } = require('./src/services/TenantContextService')
 const windows = new Set()
 let autoUpdater = null
 const DESKTOP_APP_NAME = 'OrderSync.lk'
+const PRODUCTION_SYNC_API_URL = 'https://ordersync-yxm7.onrender.com/api'
+const DEVELOPMENT_SYNC_API_URL = 'http://localhost:5000/api'
 
 app.setName(DESKTOP_APP_NAME)
 
@@ -27,6 +29,14 @@ if (process.platform === 'win32' && typeof app.setAppUserModelId === 'function')
 
 const getFrontendUrl = () =>
   process.env.ELECTRON_RENDERER_URL || `file://${path.join(__dirname, '../../frontend/dist/index.html')}`
+
+const getSyncApiBaseUrl = () => {
+  if (process.env.ORDERSYNC_SYNC_API_URL) {
+    return process.env.ORDERSYNC_SYNC_API_URL
+  }
+
+  return app.isPackaged ? PRODUCTION_SYNC_API_URL : DEVELOPMENT_SYNC_API_URL
+}
 
 const isSafeExternalUrl = (targetUrl) =>
   typeof targetUrl === 'string' &&
@@ -161,7 +171,7 @@ const createAuthSessionService = () => {
   })
 
   return new AuthSessionService({
-    apiBaseUrl: process.env.ORDERSYNC_SYNC_API_URL || 'http://localhost:5001/api',
+    apiBaseUrl: getSyncApiBaseUrl(),
     secureStore,
     isOnline,
   })
@@ -170,7 +180,7 @@ const createAuthSessionService = () => {
 const createDesktopService = (authSessionService) =>
   new OrderSyncDesktopService({
     baseDbDir: path.join(app.getPath('userData'), 'tenant-dbs'),
-    syncApiBaseUrl: process.env.ORDERSYNC_SYNC_API_URL || 'http://localhost:5001/api',
+    syncApiBaseUrl: getSyncApiBaseUrl(),
     getAuthHeaders: async () => authSessionService.getAuthHeaders(),
     resolveActiveTenantContext: async () => authSessionService.resolveTenantContext(),
     isOnline,
@@ -181,7 +191,7 @@ const createDesktopService = (authSessionService) =>
 
 const createChatbotService = (authSessionService) =>
   new ChatbotBridgeService({
-    apiBaseUrl: process.env.ORDERSYNC_SYNC_API_URL || 'http://localhost:5001/api',
+    apiBaseUrl: getSyncApiBaseUrl(),
     getAuthHeaders: async () => authSessionService.getAuthHeaders(),
     isOnline,
   })
