@@ -20,6 +20,7 @@ release-temp-shortcut.lnk
 build-assets/icon-from-ico.png
 release/win-unpacked/exe-icon.png
 release/win-unpacked/exe-icon-after-rcedit.png
+ordersync/
 
 .DS_Store
 Thumbs.db
