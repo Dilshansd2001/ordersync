@@ -20,23 +20,42 @@ const { ensureSuperAdmin } = require('./utils/bootstrapSuperAdmin')
 const { errorHandler, notFound } = require('./middlewares/errorHandler')
 
 const app = express()
-const allowedOrigins = env.frontendUrls.length
+const normalizeOrigin = (value = '') => {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return ''
+  }
+
+  try {
+    return new URL(trimmed).origin
+  } catch {
+    return trimmed.replace(/\/+$/, '')
+  }
+}
+
+const allowedOrigins = (env.frontendUrls.length
   ? env.frontendUrls
   : ['http://localhost:5173', 'http://localhost:5176', 'http://localhost:3000']
-const localhostPattern = /localhost:\d+$/
+).map(normalizeOrigin)
+const localhostPattern = /^https?:\/\/localhost:\d+$/
+const pagesDevPattern = /^https:\/\/[a-z0-9-]+\.pages\.dev$/i
 
 app.use(
   cors({
     origin: (origin, callback) => {
+      const normalizedOrigin = normalizeOrigin(origin)
+
       if (
         !origin ||
-        allowedOrigins.includes(origin) ||
-        localhostPattern.test(origin)
+        allowedOrigins.includes(normalizedOrigin) ||
+        localhostPattern.test(normalizedOrigin) ||
+        pagesDevPattern.test(normalizedOrigin)
       ) {
         return callback(null, true)
       }
 
-      return callback(new Error(`CORS blocked for origin: ${origin}`))
+      return callback(new Error(`CORS blocked for origin: ${normalizedOrigin}`))
     },
     credentials: true,
   })
