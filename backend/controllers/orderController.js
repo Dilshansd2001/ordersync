@@ -3,6 +3,7 @@ const Product = require('../models/Product')
 const Business = require('../models/Business')
 const Customer = require('../models/Customer')
 const { syncOrderToCourier } = require('../services/courier/courierService')
+const { getCourierProviderLabel } = require('../services/courier/providers')
 const { sendWhatsApp } = require('../utils/sendWhatsApp')
 const { sendCustomerMessageEvent } = require('../services/customerMessagingService')
 
@@ -276,7 +277,7 @@ const createCourierShipment = async (req, res, next) => {
     order.courierShipmentId = syncResult.shipment.courierShipmentId
     order.trackingNumber = syncResult.shipment.trackingNumber || order.trackingNumber
     order.labelUrl = syncResult.shipment.labelUrl
-    order.deliveryService = courierSettings.provider === 'CUSTOM' ? 'Custom Courier' : 'Koombiyo'
+    order.deliveryService = getCourierProviderLabel(courierSettings.provider)
     order.courierSyncStatus = 'SYNCED'
     order.courierSyncError = ''
     order.courierLastSyncedAt = new Date()
@@ -351,7 +352,7 @@ const updateOrderStatus = async (req, res, next) => {
           order.courierShipmentId = syncResult.shipment.courierShipmentId
           order.trackingNumber = syncResult.shipment.trackingNumber || order.trackingNumber
           order.labelUrl = syncResult.shipment.labelUrl
-          order.deliveryService = courierSettings.provider === 'CUSTOM' ? 'Custom Courier' : 'Koombiyo'
+          order.deliveryService = getCourierProviderLabel(courierSettings.provider)
           order.courierSyncStatus = 'SYNCED'
           order.courierSyncError = ''
           order.courierLastSyncedAt = new Date()

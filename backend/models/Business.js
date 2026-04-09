@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { randomUUID } = require('node:crypto')
 const { PLAN_ALIASES } = require('../utils/subscriptionPlans')
+const { COURIER_PROVIDER_VALUES } = require('../services/courier/providers')
 
 const registeredDeviceSchema = new mongoose.Schema(
   {
@@ -220,7 +221,7 @@ const businessSchema = new mongoose.Schema(
       },
       provider: {
         type: String,
-        enum: ['KOOMBIYO', 'CUSTOM'],
+        enum: COURIER_PROVIDER_VALUES,
         default: 'KOOMBIYO',
       },
       apiToken: {

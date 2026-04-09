@@ -11,7 +11,7 @@ const normalizePath = (path, fallback) => {
 }
 
 class CourierClient {
-  constructor(settings = {}) {
+  constructor(settings = {}, providerConfig = {}) {
     const baseURL = String(settings.baseUrl || '').trim().replace(/\/+$/, '')
 
     if (!baseURL) {
@@ -19,6 +19,7 @@ class CourierClient {
     }
 
     this.settings = settings
+    this.providerConfig = providerConfig
     this.http = axios.create({
       baseURL,
       timeout: 15000,
@@ -47,7 +48,10 @@ class CourierClient {
   }
 
   async ping() {
-    const path = normalizePath(this.settings.healthCheckPath, '/health')
+    const path = normalizePath(
+      this.settings.healthCheckPath,
+      this.providerConfig?.placeholders?.healthCheckPath || '/health'
+    )
     const response = await this.http.get(path)
 
     return {
@@ -58,7 +62,10 @@ class CourierClient {
   }
 
   async createShipment(payload) {
-    const path = normalizePath(this.settings.createShipmentPath, '/shipments')
+    const path = normalizePath(
+      this.settings.createShipmentPath,
+      this.providerConfig?.placeholders?.createShipmentPath || '/shipments'
+    )
     const response = await this.http.post(path, payload)
 
     return {

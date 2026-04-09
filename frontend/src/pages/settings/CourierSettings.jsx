@@ -28,6 +28,16 @@ const defaultForm = {
   autoDispatch: false,
 }
 
+const defaultCourierProviders = [
+  { value: 'KOOMBIYO', label: 'Koombiyo' },
+  { value: 'DEX', label: 'DEX' },
+  { value: 'DOMEX', label: 'Domex' },
+  { value: 'PROMPT_XPRESS', label: 'Prompt Xpress' },
+  { value: 'PRONTO', label: 'Pronto' },
+  { value: 'CITYPAK', label: 'Citypak' },
+  { value: 'CUSTOM', label: 'Custom Courier API' },
+]
+
 const prepareSecretField = (value, originalMasked) =>
   value && value === originalMasked ? undefined : value
 
@@ -45,6 +55,7 @@ function CourierSettings() {
     apiKey: '',
     apiSecret: '',
   })
+  const [providerOptions, setProviderOptions] = useState(defaultCourierProviders)
   const [form, setForm] = useState(defaultForm)
 
   useEffect(() => {
@@ -53,6 +64,11 @@ function CourierSettings() {
         setLoading(true)
         const response = await settingsService.getCourierSettings()
         const settings = response.data.business.courierSettings || {}
+        const availableProviders = response.data.business.availableCourierProviders
+
+        if (Array.isArray(availableProviders) && availableProviders.length) {
+          setProviderOptions(availableProviders)
+        }
 
         setMaskedSecrets({
           apiToken: settings.apiToken || '',
@@ -218,9 +234,15 @@ function CourierSettings() {
                 onChange={(event) => updateField('provider', event.target.value)}
                 value={form.provider}
               >
-                <option value="KOOMBIYO">Koombiyo</option>
-                <option value="CUSTOM">Custom Courier API</option>
+                {providerOptions.map((provider) => (
+                  <option key={provider.value} value={provider.value}>
+                    {provider.label}
+                  </option>
+                ))}
               </select>
+              <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">
+                Auth method and required API fields can vary by courier provider.
+              </p>
             </label>
 
             <label className="space-y-2">

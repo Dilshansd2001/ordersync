@@ -1,10 +1,11 @@
 const Business = require('../models/Business')
 const User = require('../models/User')
 const { buildFileUrl } = require('../utils/cloudinary')
+const { pingCourierConnection } = require('../services/courier/courierService')
 const {
-  assertCourierSettingsReady,
-  pingCourierConnection,
-} = require('../services/courier/courierService')
+  COURIER_PROVIDER_OPTIONS,
+  COURIER_PROVIDER_VALUES,
+} = require('../services/courier/providers')
 const { defaultSmsTemplate } = require('../utils/sendTextMessage')
 const {
   getSubscriptionStatus,
@@ -489,6 +490,7 @@ const getCourierSettings = async (req, res, next) => {
         business: {
           ...withPlanCapabilities(business),
           courierSettings: sanitizeCourierSettings(business.courierSettings),
+          availableCourierProviders: COURIER_PROVIDER_OPTIONS,
         },
       },
     })
@@ -509,9 +511,12 @@ const updateCourierSettings = async (req, res, next) => {
     }
 
     const currentSettings = existingBusiness.courierSettings || defaultCourierSettings
+    const requestedProvider = String(req.body.provider || '').trim().toUpperCase()
     const courierSettings = {
       enabled: Boolean(req.body.enabled),
-      provider: req.body.provider === 'CUSTOM' ? 'CUSTOM' : 'KOOMBIYO',
+      provider: COURIER_PROVIDER_VALUES.includes(requestedProvider)
+        ? requestedProvider
+        : defaultCourierSettings.provider,
       apiToken:
         req.body.apiToken === undefined
           ? currentSettings.apiToken || ''
@@ -557,6 +562,7 @@ const updateCourierSettings = async (req, res, next) => {
         business: {
           ...withPlanCapabilities(business),
           courierSettings: sanitizeCourierSettings(business.courierSettings),
+          availableCourierProviders: COURIER_PROVIDER_OPTIONS,
         },
       },
     })
@@ -576,7 +582,6 @@ const testCourierSettings = async (req, res, next) => {
       })
     }
 
-    assertCourierSettingsReady(business.courierSettings)
     const result = await pingCourierConnection(business.courierSettings)
 
     return res.status(200).json({
