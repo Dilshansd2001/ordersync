@@ -170,8 +170,9 @@ class BootstrapOrchestrator {
     return this.getBootstrapState()
   }
 
-  async enterWorkspace() {
-    const state = await this.getBootstrapState()
+  async enterWorkspace(existingState = null) {
+    const state =
+      existingState && existingState.canOpenWorkspace ? existingState : await this.getBootstrapState()
 
     if (!state.canOpenWorkspace) {
       return state

@@ -29,7 +29,7 @@ contextBridge.exposeInMainWorld('ordersyncShell', {
   login: (payload) => ipcRenderer.invoke(ORDERSYNC_CHANNELS.SHELL_LOGIN, payload),
   logout: () => ipcRenderer.invoke(ORDERSYNC_CHANNELS.SHELL_LOGOUT),
   selectTenant: (tenantId) => ipcRenderer.invoke(ORDERSYNC_CHANNELS.SHELL_SELECT_TENANT, tenantId),
-  enterWorkspace: () => ipcRenderer.invoke(ORDERSYNC_CHANNELS.SHELL_ENTER_WORKSPACE),
+  enterWorkspace: (payload) => ipcRenderer.invoke(ORDERSYNC_CHANNELS.SHELL_ENTER_WORKSPACE, payload),
 })
 
 contextBridge.exposeInMainWorld('ordersync', {

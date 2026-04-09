@@ -11,8 +11,8 @@ const registerBootstrapIpcHandlers = ({ ipcMain, bootstrapOrchestrator }) => {
   ipcMain.handle(ORDERSYNC_CHANNELS.SHELL_SELECT_TENANT, async (_event, tenantId) =>
     bootstrapOrchestrator.selectTenant(tenantId)
   )
-  ipcMain.handle(ORDERSYNC_CHANNELS.SHELL_ENTER_WORKSPACE, async () =>
-    bootstrapOrchestrator.enterWorkspace()
+  ipcMain.handle(ORDERSYNC_CHANNELS.SHELL_ENTER_WORKSPACE, async (_event, payload) =>
+    bootstrapOrchestrator.enterWorkspace(payload)
   )
 }
 

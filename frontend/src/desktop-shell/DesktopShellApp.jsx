@@ -107,7 +107,7 @@ function DesktopShellApp() {
 
     const openWorkspace = async () => {
       try {
-        const nextState = await window.ordersyncShell.enterWorkspace()
+        const nextState = await window.ordersyncShell.enterWorkspace(shellState)
         if (isMounted) {
           applyState(nextState)
         }
@@ -123,7 +123,7 @@ function DesktopShellApp() {
     return () => {
       isMounted = false
     }
-  }, [applyState, shellState.screen])
+  }, [applyState, shellState])
 
   const handleLogin = async (credentials) => {
     setIsBusy(true)
