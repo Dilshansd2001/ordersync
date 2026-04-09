@@ -169,6 +169,24 @@ const whyOrderSync = [
   },
 ]
 
+const aiAssistantHighlights = [
+  {
+    title: 'Ask in Sinhala or English',
+    description: 'Teams can ask for help naturally and get quick guidance without digging through menus or reports.',
+    icon: MessageSquareMore,
+  },
+  {
+    title: 'Prepare safe business actions',
+    description: 'OrderSync AI Assistant can help draft actions like adding customers, products, expenses, and follow-up workflows before confirmation.',
+    icon: Zap,
+  },
+  {
+    title: 'Built into the workspace',
+    description: 'It stays close to orders, customers, dispatch, and reports, so support feels relevant instead of generic.',
+    icon: ShieldCheck,
+  },
+]
+
 const pricingPlans = pricingPlanCards
 
 const pricingHighlights = [
@@ -582,6 +600,76 @@ function LandingPage() {
                     </article>
                   )
                 })}
+              </div>
+            </div>
+          </section>
+
+          <section className="relative overflow-hidden bg-[linear-gradient(180deg,#edf4ff_0%,#dfeeff_100%)] py-20">
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute left-[10%] top-12 h-44 w-44 rounded-full bg-cyan-400/20 blur-3xl" />
+              <div className="absolute right-[8%] bottom-10 h-52 w-52 rounded-full bg-violet-500/20 blur-3xl" />
+            </div>
+
+            <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+                <div className="rounded-[32px] border border-slate-200/80 bg-[linear-gradient(135deg,#081120_0%,#13264a_54%,#2c1f63_100%)] p-7 text-white shadow-[0_28px_80px_rgba(15,23,42,0.2)] sm:p-8">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    OrderSync AI Assistant
+                  </div>
+                  <h2 className="mt-5 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
+                    Get instant help inside the same workspace where your orders move.
+                  </h2>
+                  <p className="mt-4 max-w-2xl text-base leading-7 text-slate-200">
+                    OrderSync AI Assistant helps sellers and staff understand workflows faster, prepare safe actions,
+                    and stay productive without leaving the workspace.
+                  </p>
+
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    {['Sinhala + English help', 'Action-ready guidance', 'Built into daily operations'].map((item) => (
+                      <div key={item} className="rounded-full border border-white/10 bg-white/10 px-3.5 py-2 text-sm font-medium text-slate-100">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                    <Link
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-[0_16px_40px_rgba(255,255,255,0.15)] transition hover:translate-y-[-1px] hover:bg-slate-100"
+                      to="/register"
+                    >
+                      Try AI with Free Trial
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    <a
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/16"
+                      href="#pricing"
+                    >
+                      See Plans with AI
+                    </a>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {aiAssistantHighlights.map((item, index) => {
+                    const Icon = item.icon
+
+                    return (
+                      <article
+                        key={item.title}
+                        className={`animate-fade-up rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-sm ${
+                          index === 0 ? 'animation-delay-100' : index === 1 ? 'animation-delay-200' : 'animation-delay-300'
+                        }`}
+                      >
+                        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-100 via-blue-100 to-violet-100 text-indigo-600">
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <h3 className="mt-4 text-lg font-semibold tracking-tight text-slate-950">{item.title}</h3>
+                        <p className="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
+                      </article>
+                    )
+                  })}
+                </div>
               </div>
             </div>
           </section>
