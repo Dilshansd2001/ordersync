@@ -45,12 +45,14 @@ const buildSuggestions = (snapshot) => {
 
 const formatCurrency = (value) => `LKR ${Number(value || 0).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-const isLikelySinhalaOrMixed = (message = '') => /[අ-ෆ]/.test(message) || /\b(eka|mokakda|kiyanna|penna|kohomada)\b/i.test(message)
+const isLikelySinhalaOrMixed = (message = '') =>
+  /[අ-ෆ]/.test(message) || /\b(eka|mokakda|monada|thiyenne|kiyanna|penna|kohomada|tikak)\b/i.test(message)
 
 const buildFallbackReply = ({ message, snapshot }) => {
   const normalized = String(message || '').trim().toLowerCase()
   const mixedLanguage = isLikelySinhalaOrMixed(message)
   const metrics = snapshot.metrics || {}
+  const productPreview = Array.isArray(snapshot.productPreview) ? snapshot.productPreview : []
 
   if (/(today|summary|order summary|orders today)/i.test(normalized)) {
     return mixedLanguage
@@ -73,6 +75,23 @@ const buildFallbackReply = ({ message, snapshot }) => {
     return mixedLanguage
       ? `Low stock products tikak: ${topItems}. Inventory page eken restock priority eka review karanna.`
       : `These products need attention first: ${topItems}. Review restocking priority from the Inventory page.`
+  }
+
+  if (/(products?|items?|inventory|product list|monada thiyenne|thiyenne mona|mona products)/i.test(normalized)) {
+    if (productPreview.length === 0) {
+      return mixedLanguage
+        ? 'Products list eka pennanna data ekak naha. Inventory page eka check karanna.'
+        : 'I could not find any products in the current snapshot. Please check the Inventory page.'
+    }
+
+    const items = productPreview
+      .slice(0, 5)
+      .map((item) => `${item.name} (${item.stockCount})`)
+      .join(', ')
+
+    return mixedLanguage
+      ? `Danata workspace eke products ${metrics.totalProducts || productPreview.length}k tiyenaawa. Main items: ${items}.`
+      : `There are ${metrics.totalProducts || productPreview.length} products in the workspace. Main items: ${items}.`
   }
 
   if (/(dispatch|pending)/i.test(normalized)) {

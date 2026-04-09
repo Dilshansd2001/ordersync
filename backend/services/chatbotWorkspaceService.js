@@ -6,6 +6,7 @@ const Product = require('../models/Product')
 
 const MAX_RECENT_ORDERS = 5
 const MAX_LOW_STOCK_PRODUCTS = 5
+const MAX_PRODUCT_PREVIEW = 5
 const MAX_TOP_CUSTOMERS = 5
 const MAX_RECENT_EXPENSES = 5
 const LOW_STOCK_THRESHOLD = 5
@@ -36,6 +37,7 @@ const buildWorkspaceSnapshot = async ({ businessId, user, clientContext = {} }) 
     totalProducts,
     allOrderStatuses,
     lowStockProducts,
+    productPreview,
     recentOrders,
     monthlyOrders,
     topCustomers,
@@ -57,6 +59,14 @@ const buildWorkspaceSnapshot = async ({ businessId, user, clientContext = {} }) 
       .sort({ stockCount: 1, updatedAt: -1 })
       .limit(MAX_LOW_STOCK_PRODUCTS)
       .select('name sku stockCount category updatedAt')
+      .lean(),
+    Product.find({
+      businessId,
+      deletedAt: null,
+    })
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .limit(MAX_PRODUCT_PREVIEW)
+      .select('name sku stockCount category updatedAt isAvailable')
       .lean(),
     Order.find({ businessId, deletedAt: null })
       .sort({ createdAt: -1 })
@@ -136,6 +146,14 @@ const buildWorkspaceSnapshot = async ({ businessId, user, clientContext = {} }) 
       sku: product.sku,
       stockCount: Number(product.stockCount || 0),
       category: product.category || 'Uncategorized',
+      updatedAt: toIsoDate(product.updatedAt),
+    })),
+    productPreview: productPreview.map((product) => ({
+      name: product.name,
+      sku: product.sku,
+      stockCount: Number(product.stockCount || 0),
+      category: product.category || 'Uncategorized',
+      isAvailable: Boolean(product.isAvailable),
       updatedAt: toIsoDate(product.updatedAt),
     })),
     topCustomers: topCustomers.map((customer) => ({
