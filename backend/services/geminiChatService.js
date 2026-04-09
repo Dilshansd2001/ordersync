@@ -53,6 +53,12 @@ const buildFallbackReply = ({ message, snapshot }) => {
   const mixedLanguage = isLikelySinhalaOrMixed(message)
   const metrics = snapshot.metrics || {}
   const productPreview = Array.isArray(snapshot.productPreview) ? snapshot.productPreview : []
+  const hasProductListIntent =
+    /(products?|items?|inventory|product list|available products?|monada thiyenne|thiyenne mona|mona products?|monawd)/i.test(
+      normalized,
+    )
+  const hasStockIntent =
+    /(low stock|stock|restock|stock kiyda|stock kiyada|stocks|product stock)/i.test(normalized)
 
   if (/(today|summary|order summary|orders today)/i.test(normalized)) {
     return mixedLanguage
@@ -60,8 +66,36 @@ const buildFallbackReply = ({ message, snapshot }) => {
       : `Today's workspace summary: total orders ${metrics.totalOrders || 0}, pending dispatches ${metrics.pendingDispatches || 0}, monthly revenue ${formatCurrency(metrics.monthlyRevenue)}, and monthly expenses ${formatCurrency(metrics.monthlyExpenses)}.`
   }
 
-  if (/(low stock|stock|restock)/i.test(normalized)) {
+  if (hasProductListIntent) {
+    if (productPreview.length === 0) {
+      return mixedLanguage
+        ? 'Products list eka pennanna data ekak naha. Inventory page eka check karanna.'
+        : 'I could not find any products in the current snapshot. Please check the Inventory page.'
+    }
+
+    const items = productPreview
+      .slice(0, 5)
+      .map((item) => `${item.name} (${item.stockCount})`)
+      .join(', ')
+
+    return mixedLanguage
+      ? `Danata workspace eke products ${metrics.totalProducts || productPreview.length}k tiyenaawa. Available items: ${items}.`
+      : `There are ${metrics.totalProducts || productPreview.length} products in the workspace. Available items: ${items}.`
+  }
+
+  if (hasStockIntent) {
     if (!Array.isArray(snapshot.lowStockProducts) || snapshot.lowStockProducts.length === 0) {
+      if (productPreview.length > 0) {
+        const items = productPreview
+          .slice(0, 5)
+          .map((item) => `${item.name} (${item.stockCount})`)
+          .join(', ')
+
+        return mixedLanguage
+          ? `Low stock products pennune naha. Habai danata stock data tiyena items: ${items}.`
+          : `I could not find any low-stock products. Current stock snapshot shows: ${items}.`
+      }
+
       return mixedLanguage
         ? 'Low stock products pennanna data ekak naha. Inventory page eka check karanna.'
         : 'I could not find any low-stock products in the current snapshot. Please check the Inventory page.'
@@ -75,23 +109,6 @@ const buildFallbackReply = ({ message, snapshot }) => {
     return mixedLanguage
       ? `Low stock products tikak: ${topItems}. Inventory page eken restock priority eka review karanna.`
       : `These products need attention first: ${topItems}. Review restocking priority from the Inventory page.`
-  }
-
-  if (/(products?|items?|inventory|product list|monada thiyenne|thiyenne mona|mona products)/i.test(normalized)) {
-    if (productPreview.length === 0) {
-      return mixedLanguage
-        ? 'Products list eka pennanna data ekak naha. Inventory page eka check karanna.'
-        : 'I could not find any products in the current snapshot. Please check the Inventory page.'
-    }
-
-    const items = productPreview
-      .slice(0, 5)
-      .map((item) => `${item.name} (${item.stockCount})`)
-      .join(', ')
-
-    return mixedLanguage
-      ? `Danata workspace eke products ${metrics.totalProducts || productPreview.length}k tiyenaawa. Main items: ${items}.`
-      : `There are ${metrics.totalProducts || productPreview.length} products in the workspace. Main items: ${items}.`
   }
 
   if (/(dispatch|pending)/i.test(normalized)) {
