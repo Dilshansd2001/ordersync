@@ -670,6 +670,45 @@ function LandingPage() {
                     )
                   })}
                 </div>
+
+                <div className="rounded-[28px] border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:p-6 lg:col-span-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-600">Live AI preview</p>
+                      <h3 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">See how OrderSync AI Assistant feels in real work</h3>
+                    </div>
+                    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Assistant ready
+                    </span>
+                  </div>
+
+                  <div className="mt-5 space-y-4">
+                    <div className="ml-auto max-w-[90%] rounded-[24px] rounded-br-md bg-slate-950 px-4 py-3 text-sm leading-6 text-white shadow-[0_12px_30px_rgba(15,23,42,0.18)]">
+                      Today orders 10k walin adui. Why?
+                    </div>
+                    <div className="max-w-[95%] rounded-[24px] rounded-bl-md border border-cyan-100 bg-[linear-gradient(180deg,#f8fbff,#eef6ff)] px-4 py-4 text-sm leading-6 text-slate-700 shadow-[0_12px_30px_rgba(59,130,246,0.08)]">
+                      <p className="font-semibold text-slate-950">OrderSync AI Assistant</p>
+                      <p className="mt-2">
+                        Orders adu une pending dispatch count wadi nisa wage. Mage suggestion 3k:
+                      </p>
+                      <div className="mt-3 grid gap-2">
+                        {[
+                          'Today failed or delayed dispatch orders ටික first review කරන්න.',
+                          'Repeat customers follow-up list එකක් prepare කරන්න.',
+                          'Top-selling items stock + ad spend compare report එක බලන්න.',
+                        ].map((item) => (
+                          <div key={item} className="rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-slate-700">
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-indigo-700">
+                        Safe action suggestions only
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
