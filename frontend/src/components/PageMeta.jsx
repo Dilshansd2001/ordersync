@@ -1,32 +1,29 @@
-import { useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
 
-function PageMeta({ title, description }) {
-  useEffect(() => {
-    const previousTitle = document.title
-    const meta = document.querySelector('meta[name="description"]')
-    const previousDescription = meta?.getAttribute('content') || ''
-
-    document.title = title
-
-    if (meta) {
-      meta.setAttribute('content', description)
-    } else {
-      const newMeta = document.createElement('meta')
-      newMeta.name = 'description'
-      newMeta.content = description
-      document.head.appendChild(newMeta)
-    }
-
-    return () => {
-      document.title = previousTitle
-      const currentMeta = document.querySelector('meta[name="description"]')
-      if (currentMeta) {
-        currentMeta.setAttribute('content', previousDescription)
-      }
-    }
-  }, [description, title])
-
-  return null
+function PageMeta({
+  title,
+  description,
+  keywords,
+  canonicalUrl,
+  ogTitle,
+  ogDescription,
+  ogType = 'website',
+  ogUrl,
+  ogImage,
+}) {
+  return (
+    <Helmet>
+      <title>{title}</title>
+      <meta content={description} name="description" />
+      {keywords ? <meta content={keywords} name="keywords" /> : null}
+      {canonicalUrl ? <link href={canonicalUrl} rel="canonical" /> : null}
+      <meta content={ogTitle || title} property="og:title" />
+      <meta content={ogDescription || description} property="og:description" />
+      <meta content={ogType} property="og:type" />
+      {ogUrl ? <meta content={ogUrl} property="og:url" /> : null}
+      {ogImage ? <meta content={ogImage} property="og:image" /> : null}
+    </Helmet>
+  )
 }
 
 export default PageMeta

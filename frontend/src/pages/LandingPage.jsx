@@ -307,8 +307,14 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-[#06101f] text-slate-900">
       <PageMeta
-        title="OrderSync.lk - Offline-First Business Operating System for Sri Lankan Sellers"
-        description="OrderSync.lk helps Sri Lankan sellers manage orders, customers, invoices, labels, dispatch, and profit from one offline-first desktop workspace."
+        title="OrderSync.lk | Best Order Management System in Sri Lanka"
+        description="Manage orders, track deliveries with Koombiyo, Fardar and Royal Express, print thermal invoices, and track COD profits with OrderSync.lk."
+        keywords="Order Management System Sri Lanka, POS System Sri Lanka, Courier Tracking Software, COD Tracker, Koombiyo Tracking, Manager Lokka, OrderSync.lk"
+        canonicalUrl="https://ordersync.lk/"
+        ogTitle="OrderSync.lk | Run Your Business Smarter and Faster"
+        ogDescription="Everything you need to manage orders, track deliveries, and grow your business from one powerful desktop app."
+        ogUrl="https://ordersync.lk/"
+        ogImage="https://ordersync.lk/favicon.png"
       />
 
       <div className="relative overflow-hidden bg-[linear-gradient(180deg,#081120_0%,#0b1426_44%,#eef4ff_44%,#f7faff_100%)]">
