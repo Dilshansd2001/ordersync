@@ -37,6 +37,55 @@ const navItems = [
 
 const DESKTOP_DOWNLOAD_URL =
   'https://github.com/Dilshansd2001/ordersync/releases/download/v1.0.1/OrderSync.lk-Setup-1.0.1.exe'
+const SITE_URL = 'https://ordersync.lk/'
+const OG_IMAGE_URL = 'https://ordersync.lk/favicon.png'
+const ORGANIZATION_ID = `${SITE_URL}#organization`
+const WEBSITE_ID = `${SITE_URL}#website`
+const SOFTWARE_ID = `${SITE_URL}#software`
+
+const landingPageStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': ORGANIZATION_ID,
+    name: 'OrderSync.lk',
+    url: SITE_URL,
+    logo: OG_IMAGE_URL,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': WEBSITE_ID,
+    url: SITE_URL,
+    name: 'OrderSync.lk',
+    description: 'Offline-first desktop order management system for Sri Lankan sellers.',
+    publisher: {
+      '@id': ORGANIZATION_ID,
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    '@id': SOFTWARE_ID,
+    name: 'OrderSync.lk',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Windows 10, Windows 11',
+    url: SITE_URL,
+    downloadUrl: DESKTOP_DOWNLOAD_URL,
+    image: OG_IMAGE_URL,
+    description:
+      'OrderSync.lk is an offline-first desktop app for Sri Lankan sellers to manage orders, customers, dispatch, invoices, labels, and profit tracking.',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'LKR',
+      description: '4-day free trial',
+    },
+    publisher: {
+      '@id': ORGANIZATION_ID,
+    },
+  },
+]
 
 const trustBullets = [
   'Offline-first desktop workflow',
@@ -310,11 +359,12 @@ function LandingPage() {
         title="OrderSync.lk | Best Order Management System in Sri Lanka"
         description="Manage orders, track deliveries with Koombiyo, Fardar and Royal Express, print thermal invoices, and track COD profits with OrderSync.lk."
         keywords="Order Management System Sri Lanka, POS System Sri Lanka, Courier Tracking Software, COD Tracker, Koombiyo Tracking, Manager Lokka, OrderSync.lk"
-        canonicalUrl="https://ordersync.lk/"
+        canonicalUrl={SITE_URL}
         ogTitle="OrderSync.lk | Run Your Business Smarter and Faster"
         ogDescription="Everything you need to manage orders, track deliveries, and grow your business from one powerful desktop app."
-        ogUrl="https://ordersync.lk/"
-        ogImage="https://ordersync.lk/favicon.png"
+        ogUrl={SITE_URL}
+        ogImage={OG_IMAGE_URL}
+        structuredData={landingPageStructuredData}
       />
 
       <div className="relative overflow-hidden bg-[linear-gradient(180deg,#081120_0%,#0b1426_44%,#eef4ff_44%,#f7faff_100%)]">
