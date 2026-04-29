@@ -34,10 +34,15 @@ const normalizeOrigin = (value = '') => {
   }
 }
 
-const allowedOrigins = (env.frontendUrls.length
-  ? env.frontendUrls
-  : ['http://localhost:5173', 'http://localhost:5176', 'http://localhost:3000']
-).map(normalizeOrigin)
+const defaultAllowedOrigins = [
+  'https://ordersync.lk',
+  'https://www.ordersync.lk',
+  'http://localhost:5173',
+  'http://localhost:5176',
+  'http://localhost:3000',
+]
+
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...env.frontendUrls].map(normalizeOrigin).filter(Boolean))]
 const localhostPattern = /^https?:\/\/localhost:\d+$/
 const pagesDevPattern = /^https:\/\/[a-z0-9-]+\.pages\.dev$/i
 
