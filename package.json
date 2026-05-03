@@ -41,7 +41,6 @@
       "output": "release"
     },
     "win": {
-      "signAndEditExecutable": false,
       "target": [
         {
           "target": "nsis",
