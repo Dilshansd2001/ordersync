@@ -24,7 +24,13 @@ function ManageSellers() {
 
   const handleSendActivationKey = async (seller) => {
     const result = await dispatch(sendSellerActivationKeyAdmin(seller._id)).unwrap()
-    toast.success(`Activation key sent to ${result.seller.sellerEmail}.`)
+
+    if (result.emailDelivered) {
+      toast.success(`Activation key sent to ${result.seller.sellerEmail}.`)
+      return
+    }
+
+    toast.error(result.emailError || `Activation key generated for ${result.seller.sellerEmail}, but email delivery failed.`)
   }
 
   return (

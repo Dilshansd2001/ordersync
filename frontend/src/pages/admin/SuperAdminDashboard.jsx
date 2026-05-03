@@ -11,6 +11,8 @@ const chartColors = ['#4f46e5', '#10b981', '#f97316', '#ec4899']
 function SuperAdminDashboard() {
   const dispatch = useDispatch()
   const { overview, loading } = useSelector((state) => state.admin)
+  const planDistribution = overview.planDistribution || []
+  const hasPlanDistribution = planDistribution.some((entry) => Number(entry.value) > 0)
 
   useEffect(() => {
     dispatch(fetchAdminOverview())
@@ -59,24 +61,30 @@ function SuperAdminDashboard() {
         <article className="rounded-[28px] border border-white/60 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/75">
           <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Plan Distribution</h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">How sellers are split across subscription tiers.</p>
-          <div className="mt-6 h-80 rounded-[24px] bg-slate-50/80 p-3 dark:bg-slate-900/70">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Tooltip
-                  contentStyle={{
-                    background: '#020617',
-                    border: '1px solid #1e293b',
-                    borderRadius: '16px',
-                    color: '#e2e8f0',
-                  }}
-                />
-                <Pie data={overview.planDistribution || []} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100}>
-                  {(overview.planDistribution || []).map((entry, index) => (
-                    <Cell key={entry.name} fill={chartColors[index % chartColors.length]} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="mt-6 h-80 min-h-[20rem] rounded-[24px] bg-slate-50/80 p-3 dark:bg-slate-900/70">
+            {hasPlanDistribution ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={240} minHeight={240}>
+                <PieChart>
+                  <Tooltip
+                    contentStyle={{
+                      background: '#020617',
+                      border: '1px solid #1e293b',
+                      borderRadius: '16px',
+                      color: '#e2e8f0',
+                    }}
+                  />
+                  <Pie data={planDistribution} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100}>
+                    {planDistribution.map((entry, index) => (
+                      <Cell key={entry.name} fill={chartColors[index % chartColors.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-slate-500 dark:text-slate-400">
+                No subscription plan data yet.
+              </div>
+            )}
           </div>
         </article>
       </section>

@@ -247,13 +247,24 @@ const sendSellerActivationKey = async (req, res, next) => {
     business.activationKeyExpiresAt = activationKeyExpiresAt
     await business.save()
 
-    const emailStatus = await sendActivationKeyEmail({
-      activationKey,
-      businessName: business.name,
-      expiresAt: activationKeyExpiresAt,
-      selectedPlan: normalizeSubscriptionPlan(business.subscriptionPlan),
-      toEmail: recipientEmail,
-    })
+    let emailStatus = { delivered: false, skipped: false, error: null }
+
+    try {
+      emailStatus = await sendActivationKeyEmail({
+        activationKey,
+        businessName: business.name,
+        expiresAt: activationKeyExpiresAt,
+        selectedPlan: normalizeSubscriptionPlan(business.subscriptionPlan),
+        toEmail: recipientEmail,
+      })
+    } catch (error) {
+      emailStatus = {
+        delivered: false,
+        skipped: false,
+        error: error.message || 'Unknown email error',
+      }
+      console.error('[admin] Failed to send activation key email:', error)
+    }
 
     await logActivity({
       actorUserId: req.user?._id,
@@ -266,6 +277,7 @@ const sendSellerActivationKey = async (req, res, next) => {
       metadata: {
         recipientEmail,
         emailDelivered: emailStatus.delivered,
+        emailError: emailStatus.error,
         activationExpiresAt: activationKeyExpiresAt,
       },
     })
@@ -274,7 +286,7 @@ const sendSellerActivationKey = async (req, res, next) => {
       success: true,
       message: emailStatus.delivered
         ? 'Activation key email sent successfully.'
-        : 'Activation key generated, but email delivery was skipped. Check SMTP settings.',
+        : 'Activation key generated, but email delivery failed. Check SMTP settings and server logs.',
       data: {
         seller: {
           _id: business._id,
@@ -289,6 +301,7 @@ const sendSellerActivationKey = async (req, res, next) => {
           status: business.isActive ? 'active' : 'suspended',
         },
         emailDelivered: emailStatus.delivered,
+        emailError: emailStatus.error,
       },
     })
   } catch (error) {
