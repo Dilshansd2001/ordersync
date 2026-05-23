@@ -25,8 +25,8 @@ function ShippingLabelModal({ open, order, onClose }) {
   const businessName = business?.name || 'OrderSync.lk'
 
   const barcodeDigits = useMemo(
-    () => (order?.trackingNumber || order?.orderId || 'ORDERSYNC').replace(/\s+/g, '').toUpperCase(),
-    [order?.orderId, order?.trackingNumber]
+    () => (order?.trackingNumber || '').replace(/\s+/g, '').toUpperCase(),
+    [order?.trackingNumber]
   )
 
   const handlePrint = useReactToPrint({
@@ -128,18 +128,24 @@ function ShippingLabelModal({ open, order, onClose }) {
                 </div>
 
                 <div className="min-w-[180px] border-2 border-black bg-white px-3 py-3 print:px-2 print:py-2">
-                  <div className="flex justify-center overflow-hidden">
-                    <Barcode
-                      background="#ffffff"
-                      displayValue
-                      format="CODE128"
-                      height={40}
-                      lineColor="#000000"
-                      margin={0}
-                      value={barcodeDigits}
-                      width={1.5}
-                    />
-                  </div>
+                  {barcodeDigits ? (
+                    <div className="flex justify-center overflow-hidden">
+                      <Barcode
+                        background="#ffffff"
+                        displayValue
+                        format="CODE128"
+                        height={40}
+                        lineColor="#000000"
+                        margin={0}
+                        value={barcodeDigits}
+                        width={1.5}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex h-[72px] items-center justify-center text-center text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      Barcode available after shipment creation
+                    </div>
+                  )}
                 </div>
               </div>
 

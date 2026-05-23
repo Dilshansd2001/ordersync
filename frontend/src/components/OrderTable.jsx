@@ -30,7 +30,10 @@ function OrderTable({ orders, onCreateShipment, onOpenInvoice, onOpenOrder, onPr
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-transparent">
-            {orders.map((order) => (
+            {orders.map((order) => {
+              const shipmentExists = Boolean(order.courierShipmentId)
+
+              return (
               <tr key={getOrderKey(order)} className="transition hover:bg-slate-50 dark:hover:bg-slate-900/45">
                 <td className="px-6 py-4">
                   <div className="font-medium text-slate-900 dark:text-white">{order.orderId}</div>
@@ -65,12 +68,16 @@ function OrderTable({ orders, onCreateShipment, onOpenInvoice, onOpenOrder, onPr
                   <div className="flex items-center justify-end gap-2">
                     <button
                       className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-                      disabled={shipmentLoadingId === getOrderKey(order)}
+                      disabled={shipmentLoadingId === getOrderKey(order) || shipmentExists}
                       onClick={() => onCreateShipment?.(order)}
                       type="button"
                     >
                       <Truck className="h-4 w-4" />
-                      {shipmentLoadingId === getOrderKey(order) ? 'Creating...' : 'Create Shipment'}
+                      {shipmentLoadingId === getOrderKey(order)
+                        ? 'Creating...'
+                        : shipmentExists
+                          ? 'Shipment Created'
+                          : 'Create Shipment'}
                     </button>
                     <div className="relative inline-block text-left">
                     <button
@@ -133,7 +140,8 @@ function OrderTable({ orders, onCreateShipment, onOpenInvoice, onOpenOrder, onPr
                   </div>
                 </td>
               </tr>
-            ))}
+              )
+            })}
           </tbody>
         </table>
       </div>

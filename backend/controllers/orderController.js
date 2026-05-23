@@ -1,3 +1,5 @@
+const mongoose = require('mongoose')
+const Counter = require('../models/Counter')
 const Order = require('../models/Order')
 const Product = require('../models/Product')
 const Business = require('../models/Business')
@@ -10,11 +12,42 @@ const { sendCustomerMessageEvent } = require('../services/customerMessagingServi
 const calculateItemsTotal = (items = []) =>
   items.reduce((sum, item) => sum + Number(item.qty || 0) * Number(item.unitPrice || 0), 0)
 
-const generateNextOrderId = async (businessId) => {
-  const latestOrder = await Order.findOne({ businessId }).sort({ createdAt: -1, _id: -1 })
-  const latestSequence = latestOrder?.orderId ? Number(latestOrder.orderId.replace('ORD-', '')) || 1000 : 1000
+const ORDER_COUNTER_KEY = 'order'
+const ORDER_ID_BASE = 1000
 
-  return `ORD-${latestSequence + 1}`
+const formatOrderId = (sequence) => `ORD-${sequence}`
+
+const reserveOrderSequences = async (businessId, count = 1, session = null) => {
+  const collection = Counter.collection
+  const result = await collection.findOneAndUpdate(
+    { businessId: new mongoose.Types.ObjectId(businessId), key: ORDER_COUNTER_KEY },
+    [
+      {
+        $set: {
+          businessId: new mongoose.Types.ObjectId(businessId),
+          key: ORDER_COUNTER_KEY,
+          value: {
+            $add: [{ $ifNull: ['$value', ORDER_ID_BASE] }, count],
+          },
+        },
+      },
+    ],
+    {
+      upsert: true,
+      returnDocument: 'after',
+      session,
+    }
+  )
+
+  const lastSequence = result.value?.value || ORDER_ID_BASE
+  const firstSequence = lastSequence - count + 1
+
+  return Array.from({ length: count }, (_, index) => firstSequence + index)
+}
+
+const generateNextOrderId = async (businessId, session = null) => {
+  const [nextSequence] = await reserveOrderSequences(businessId, 1, session)
+  return formatOrderId(nextSequence)
 }
 
 const normalizeOrderPayload = (payload, businessId, orderId) => {
@@ -40,7 +73,39 @@ const normalizeOrderPayload = (payload, businessId, orderId) => {
   }
 }
 
-const deductStockForItems = async (businessId, items = []) => {
+const validateOrderInput = (payload = {}) => {
+  if (!String(payload.customerName || '').trim()) {
+    throw new Error('Customer name is required.')
+  }
+
+  if (!String(payload.customerPhone || '').trim()) {
+    throw new Error('Customer phone is required.')
+  }
+
+  if (!String(payload.customerAddress || '').trim()) {
+    throw new Error('Customer address is required.')
+  }
+
+  if (!Array.isArray(payload.items) || payload.items.length === 0) {
+    throw new Error('At least one order item is required.')
+  }
+
+  payload.items.forEach((item, index) => {
+    if (!String(item.description || '').trim()) {
+      throw new Error(`Item ${index + 1} description is required.`)
+    }
+
+    if (!Number.isFinite(Number(item.qty)) || Number(item.qty) <= 0) {
+      throw new Error(`Item ${index + 1} quantity must be greater than 0.`)
+    }
+
+    if (!Number.isFinite(Number(item.unitPrice)) || Number(item.unitPrice) < 0) {
+      throw new Error(`Item ${index + 1} unit price cannot be negative.`)
+    }
+  })
+}
+
+const deductStockForItems = async (businessId, items = [], session = null) => {
   const inventoryItems = items.filter((item) => item.productId && Number(item.qty) > 0)
 
   if (!inventoryItems.length) {
@@ -48,7 +113,7 @@ const deductStockForItems = async (businessId, items = []) => {
   }
 
   const productIds = inventoryItems.map((item) => item.productId)
-  const products = await Product.find({ businessId, _id: { $in: productIds } })
+  const products = await Product.find({ businessId, _id: { $in: productIds } }).session(session)
   const productMap = new Map(products.map((product) => [String(product._id), product]))
 
   inventoryItems.forEach((item) => {
@@ -69,11 +134,12 @@ const deductStockForItems = async (businessId, items = []) => {
         filter: { _id: item.productId, businessId },
         update: { $inc: { stockCount: -Number(item.qty) } },
       },
-    }))
+    })),
+    session ? { session } : {}
   )
 }
 
-const syncCustomerFromOrder = async (businessId, orderPayload) => {
+const syncCustomerFromOrder = async (businessId, orderPayload, session = null) => {
   const customerName = String(orderPayload.customerName || '').trim()
   const customerPhone = String(orderPayload.customerPhone || '').trim()
 
@@ -84,7 +150,7 @@ const syncCustomerFromOrder = async (businessId, orderPayload) => {
   const existingCustomer = await Customer.findOne({
     businessId,
     phone: customerPhone,
-  })
+  }).session(session)
 
   if (existingCustomer) {
     const mergedTotalSpend = Number(existingCustomer.totalSpend || 0) + Number(orderPayload.totalAmount || 0)
@@ -97,38 +163,54 @@ const syncCustomerFromOrder = async (businessId, orderPayload) => {
     existingCustomer.totalSpend = mergedTotalSpend
     existingCustomer.orderCount = mergedOrderCount
     existingCustomer.loyaltyStatus = 'ACTIVE'
-    await existingCustomer.save()
+    await existingCustomer.save({ session })
 
     return existingCustomer
   }
 
-  return Customer.create({
-    businessId,
-    name: customerName,
-    phone: customerPhone,
-    whatsappNumber: customerPhone,
-    addressLine: orderPayload.customerAddress || '',
-    district: orderPayload.district || '',
-    loyaltyStatus: 'ACTIVE',
-    totalSpend: Number(orderPayload.totalAmount || 0),
-    orderCount: 1,
-  })
+  const [customer] = await Customer.create(
+    [
+      {
+        businessId,
+        name: customerName,
+        phone: customerPhone,
+        whatsappNumber: customerPhone,
+        addressLine: orderPayload.customerAddress || '',
+        district: orderPayload.district || '',
+        loyaltyStatus: 'ACTIVE',
+        totalSpend: Number(orderPayload.totalAmount || 0),
+        orderCount: 1,
+      },
+    ],
+    session ? { session } : {}
+  )
+
+  return customer
 }
 
 const createOrder = async (req, res, next) => {
-  try {
-    const normalizedOrder = normalizeOrderPayload(
-      req.body,
-      req.businessId,
-      await generateNextOrderId(req.businessId)
-    )
+  const session = await mongoose.startSession()
 
-    await deductStockForItems(req.businessId, normalizedOrder.items)
-    const customer = await syncCustomerFromOrder(req.businessId, normalizedOrder)
-    if (customer?.entityId) {
-      normalizedOrder.customerEntityId = customer.entityId
-    }
-    const order = await Order.create(normalizedOrder)
+  try {
+    validateOrderInput(req.body)
+
+    let order
+
+    await session.withTransaction(async () => {
+      const normalizedOrder = normalizeOrderPayload(
+        req.body,
+        req.businessId,
+        await generateNextOrderId(req.businessId, session)
+      )
+
+      await deductStockForItems(req.businessId, normalizedOrder.items, session)
+      const customer = await syncCustomerFromOrder(req.businessId, normalizedOrder, session)
+      if (customer?.entityId) {
+        normalizedOrder.customerEntityId = customer.entityId
+      }
+
+      ;[order] = await Order.create([normalizedOrder], { session })
+    })
 
     try {
       await sendCustomerMessageEvent({
@@ -147,10 +229,14 @@ const createOrder = async (req, res, next) => {
     })
   } catch (error) {
     return next(error)
+  } finally {
+    await session.endSession()
   }
 }
 
 const bulkCreateOrders = async (req, res, next) => {
+  const session = await mongoose.startSession()
+
   try {
     const ordersArray = Array.isArray(req.body.orders) ? req.body.orders : []
 
@@ -161,25 +247,26 @@ const bulkCreateOrders = async (req, res, next) => {
       })
     }
 
-    const latestOrder = await Order.findOne({ businessId: req.businessId }).sort({ createdAt: -1, _id: -1 })
-    let nextSequence = latestOrder?.orderId
-      ? Number(latestOrder.orderId.replace('ORD-', '')) || 1000
-      : 1000
+    ordersArray.forEach((payload) => validateOrderInput(payload))
 
-    const documents = ordersArray.map((payload) => {
-      nextSequence += 1
-      return normalizeOrderPayload(payload, req.businessId, `ORD-${nextSequence}`)
-    })
+    let insertedOrders = []
 
-    for (const document of documents) {
-      await deductStockForItems(req.businessId, document.items)
-      const customer = await syncCustomerFromOrder(req.businessId, document)
-      if (customer?.entityId) {
-        document.customerEntityId = customer.entityId
+    await session.withTransaction(async () => {
+      const sequences = await reserveOrderSequences(req.businessId, ordersArray.length, session)
+      const documents = sequences.map((sequence, index) =>
+        normalizeOrderPayload(ordersArray[index], req.businessId, formatOrderId(sequence))
+      )
+
+      for (const document of documents) {
+        await deductStockForItems(req.businessId, document.items, session)
+        const customer = await syncCustomerFromOrder(req.businessId, document, session)
+        if (customer?.entityId) {
+          document.customerEntityId = customer.entityId
+        }
       }
-    }
 
-    const insertedOrders = await Order.insertMany(documents, { ordered: true })
+      insertedOrders = await Order.insertMany(documents, { ordered: true, session })
+    })
 
     for (const order of insertedOrders) {
       try {
@@ -200,6 +287,8 @@ const bulkCreateOrders = async (req, res, next) => {
     })
   } catch (error) {
     return next(error)
+  } finally {
+    await session.endSession()
   }
 }
 
@@ -265,6 +354,13 @@ const createCourierShipment = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: 'Courier integration is disabled.',
+      })
+    }
+
+    if (order.courierShipmentId) {
+      return res.status(409).json({
+        success: false,
+        message: 'A courier shipment has already been created for this order.',
       })
     }
 

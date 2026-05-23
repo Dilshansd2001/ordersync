@@ -84,6 +84,9 @@ function OrderDetailsDrawer({ open, order, onClose, onCreateShipment, onSuccess,
     return null
   }
 
+  const shipmentExists = Boolean(order.courierShipmentId)
+  const orderKey = order?._id || order?.entityId || order?.entity_id
+
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <button
@@ -266,16 +269,20 @@ function OrderDetailsDrawer({ open, order, onClose, onCreateShipment, onSuccess,
               </div>
               <button
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
-                disabled={shipmentLoadingId === (order?._id || order?.entityId || order?.entity_id)}
+                disabled={shipmentLoadingId === orderKey || shipmentExists}
                 onClick={() => onCreateShipment?.(order)}
                 type="button"
               >
-                {shipmentLoadingId === (order?._id || order?.entityId || order?.entity_id) ? (
+                {shipmentLoadingId === orderKey ? (
                   <LoaderCircle className="h-4 w-4 animate-spin" />
                 ) : (
                   <Truck className="h-4 w-4" />
                 )}
-                {shipmentLoadingId === (order?._id || order?.entityId || order?.entity_id) ? 'Creating shipment...' : 'Create Shipment'}
+                {shipmentLoadingId === orderKey
+                  ? 'Creating shipment...'
+                  : shipmentExists
+                    ? 'Shipment Created'
+                    : 'Create Shipment'}
               </button>
             </div>
 
